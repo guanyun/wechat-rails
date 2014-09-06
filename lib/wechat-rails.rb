@@ -1,7 +1,6 @@
 require "wechat/api"
-
+require "wechat/message"
 module Wechat
-  autoload :Message, "wechat/message"
   autoload :Responder, "wechat/responder"
   autoload :Response, "wechat/response"
 
