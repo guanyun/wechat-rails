@@ -81,7 +81,7 @@ module Wechat
     def create
       request = Wechat::Message.from_hash(params[:xml] || post_xml)
       response = self.class.responder_for(request) do |responder, *args|
-        next need_sign_in if (responder[:auth]) && !request.try(:user)
+        next need_sign_in(request) if (responder[:auth]) && !request.try(:user)
         responder ||= self.class.responders(:fallback).first
         next if responder.nil?
         next request.reply.text responder[:respond] if (responder[:respond])
