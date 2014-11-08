@@ -1,4 +1,6 @@
 require "wechat/api"
+require "wechat/payment"
+
 module Wechat
   autoload :Message, "wechat/message"
   autoload :Responder, "wechat/responder"
@@ -13,9 +15,9 @@ module Wechat
     end
   end
 
-  attr_reader :config
+  module_function
 
-  def self.config
+  def config
     @config ||= begin
       if defined? Rails
         config_file = Rails.root.join("config/wechat.yml")
@@ -29,8 +31,12 @@ module Wechat
     end
   end
 
-  def self.api
-    @api ||= Wechat::Api.new(self.config.appid, self.config.secret, self.config.access_token)
+  def api
+    @api ||= Wechat::Api.new(config.appid, config.secret, config.access_token)
+  end
+
+  def payment
+    @payment ||= Wechat::Payment.new(config.appid, config.secret, config.mchid, config.key, config.notify_url)
   end
 end
 

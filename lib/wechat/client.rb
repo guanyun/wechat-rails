@@ -24,7 +24,7 @@ module Wechat
     def request path, header={}, &block
       url = "#{header.delete(:base) || self.base}#{path}"
       as = header.delete(:as)
-      header.merge!(:accept => :json)
+      header.merge!(:accept => :json) if as == :json
       response = yield(url, header)
 
       raise "Request not OK, response code #{response.code}" if response.code != 200
@@ -37,7 +37,7 @@ module Wechat
 
         when 42001, 40014 #42001: access_token超时, 40014:不合法的access_token
           raise AccessTokenExpiredError
-          
+
         else
           raise ResponseError.new(data['errcode'], data['errmsg'])
         end
@@ -46,7 +46,7 @@ module Wechat
 
     private
     def parse_response response, as
-      content_type = response.headers[:content_type] 
+      content_type = response.headers[:content_type]
       parse_as = {
         /^application\/json/ => :json,
         /^image\/.*/ => :file
@@ -62,7 +62,9 @@ module Wechat
 
       when :json
         data = JSON.parse(response.body)
-
+      when :xml
+        xml = Hash.from_xml(response.body).fetch('xml', {})
+        data = HashWithIndifferentAccess.new_from_hash_copying_default(xml)
       else
         data = response.body
       end
