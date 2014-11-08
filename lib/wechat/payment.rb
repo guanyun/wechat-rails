@@ -49,7 +49,8 @@ class Wechat::Payment
       appId: appid,
       timeStamp: Wechat::Utils.get_timestamp,
       nonceStr: Wechat::Utils.get_nonce_str,
-      package: "prepay_id=#{result[:prepay_id]}"
+      package: "prepay_id=#{result[:prepay_id]}",
+      signType: "MD5"
     }
     params[:paySign] = Wechat::Utils.get_sign(params, key)
     params
