@@ -23,11 +23,15 @@ module Wechat
       Time.now.to_i.to_s
     end
 
-    def get_sign(pkg, key)
-      pkg = pkg.clone
-      string1 = Hash[pkg.sort].each_with_object("") { |(key, value), s| s << "#{key}=#{value}&" }
-      string_sign_temp = "#{string1}key=#{key}"
+    def get_sign(params, key)
+      params = params.clone
+      params.delete(:sign)
+      string_sign_temp = "#{to_query(params)}&key=#{key}"
       md5(string_sign_temp).upcase
+    end
+
+    def to_query(params = {})
+      params.stringify_keys.sort.map { |key, value| "#{key}=#{value}" }.join('&')
     end
 
     def md5(sign_string)

@@ -55,4 +55,8 @@ class Wechat::Payment
     params[:paySign] = Wechat::Utils.get_sign(params, key)
     params
   end
+
+  def verify?(params)
+    Wechat::Utils.get_sign(params, key) == params[:sign]
+  end
 end
