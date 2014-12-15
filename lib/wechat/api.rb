@@ -47,7 +47,7 @@ class Wechat::Api
 
   def create_qrcode(options = {})
     limited = options.delete(:limit)
-    scene_id = options.delte(:scene_id)
+    scene_id = options.delete(:scene_id)
     action_name = limited ? 'QR_LIMIT_SCENE' : 'QR_SCENE'
     options.reverse_merge!(action_name: action_name,
                            expire_seconds: 1800,
