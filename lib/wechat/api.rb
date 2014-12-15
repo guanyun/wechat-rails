@@ -44,7 +44,18 @@ class Wechat::Api
   def custom_message_send message
     post "message/custom/send", message.to_json, content_type: :json
   end
-  
+
+  def create_qrcode(options = {})
+    limited = options.delete(:limit)
+    scene_id = options.delte(:scene_id)
+    action_name = limited ? 'QR_LIMIT_SCENE' : 'QR_SCENE'
+    options.reverse_merge!(action_name: action_name,
+                           expire_seconds: 1800,
+                           action_info: { scene: { scene_id: scene_id } })
+    options.delete(:expire_seconds) if limited
+    post "qrcode/create", options.to_json, content_type: :json
+  end
+
 
   protected
   def get path, headers={}
@@ -62,7 +73,7 @@ class Wechat::Api
     rescue Wechat::AccessTokenExpiredError => ex
       access_token.refresh
       retry unless (tries -= 1).zero?
-    end 
+    end
   end
 
 end
