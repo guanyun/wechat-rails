@@ -56,6 +56,10 @@ class Wechat::Api
     post "qrcode/create", options.to_json, content_type: :json
   end
 
+  def template_message_send message
+    post "message/template/send", message.to_json, content_type: :json
+  end
+
 
   protected
   def get path, headers={}

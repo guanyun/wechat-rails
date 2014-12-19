@@ -12,11 +12,10 @@ module Wechat
 
       attr_accessor :wechat, :token
 
-      def on message_type, with: nil, respond: nil, auth: false, &block
+      def on message_type, with: nil, respond: nil, &block
         raise "Unknow message type" unless message_type.in? [:text, :image, :voice, :video, :location, :link, :event, :fallback]
         config=respond.nil? ? {} : {:respond=>respond}
         config.merge!(:proc => block) if block_given?
-        config.merge!(:auth => auth)
         if (with.present? && !message_type.in?([:text, :event]))
           raise "Only text and event message can take :with parameters"
         else
@@ -81,7 +80,6 @@ module Wechat
     def create
       request = Wechat::Message.from_hash(params[:xml] || post_xml)
       response = self.class.responder_for(request) do |responder, *args|
-        next need_sign_in(request) if (responder[:auth]) && !request.try(:from_user)
         responder ||= self.class.responders(:fallback).first
         next if responder.nil?
         next request.reply.text responder[:respond] if (responder[:respond])

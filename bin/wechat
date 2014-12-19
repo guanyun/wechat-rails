@@ -5,13 +5,13 @@ $LOAD_PATH.unshift(lib) if File.directory?(lib) && !$LOAD_PATH.include?(lib)
 
 require 'thor'
 require "wechat-rails"
-require 'json'  
+require 'json'
 require "active_support/core_ext"
 require 'fileutils'
 
 
 
-class App < Thor                                                 
+class App < Thor
   class Helper
     def self.with(options)
       config_file = File.join(Dir.home, ".wechat.yml")
@@ -78,7 +78,7 @@ HELP
     file = File.new(path)
     puts Helper.with(options).media_create(type, file)
   end
-  
+
   desc "custom_text [OPENID, TEXT_MESSAGE]", "发送文字客服消息"
   def custom_text openid, text_message
     puts Helper.with(options).custom_message_send Wechat::Message.to(openid).text(text_message)
@@ -133,6 +133,11 @@ HELP
     puts Helper.with(options).custom_message_send Wechat::Message.to(openid).news(articles["articles"])
   end
 
+  desc "template_message [OPENID, TEMPLATE_YAML_FILE]", "模板消息接口"
+  def template_message openid, template_yaml
+    template = YAML.load(File.new(template_yaml).read)
+    puts Helper.with(options).template_message_send Wechat::Message.to(openid).template(template["template"])
+  end
 end
 
 App.start
