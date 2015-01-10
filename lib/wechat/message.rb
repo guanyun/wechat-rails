@@ -72,6 +72,10 @@ module Wechat
       update(:MsgType=>"text", :Content=>content)
     end
 
+    def transfer
+      update(:MsgType=>"transfer_customer_service")
+    end
+
     def image media_id
       update(:MsgType=>"image", :Image=>{:MediaId=>media_id})
     end
