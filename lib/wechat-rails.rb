@@ -1,4 +1,5 @@
 require "wechat/api"
+require 'wechat/card_api'
 require "wechat/payment"
 
 module Wechat
@@ -37,6 +38,10 @@ module Wechat
 
   def payment
     @payment ||= Wechat::Payment.new(config.appid, config.secret, config.mchid, config.key, config.notify_url)
+  end
+
+  def card
+    @card ||= Wechat::CardApi.new(config.appid, config.secret, config.access_token)
   end
 end
 
