@@ -33,7 +33,7 @@ module Wechat
   end
 
   def api
-    @api ||= Wechat::Api.new(config.appid, config.secret, config.access_token)
+    @api ||= Wechat::Api.new(config.appid, config.secret)
   end
 
   def payment
@@ -41,7 +41,7 @@ module Wechat
   end
 
   def card
-    @card ||= Wechat::CardApi.new(config.appid, config.secret, config.access_token)
+    @card ||= Wechat::CardApi.new(config.appid, config.secret)
   end
 end
 

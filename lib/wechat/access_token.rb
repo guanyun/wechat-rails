@@ -1,35 +1,21 @@
 module Wechat
   class AccessToken
-    attr_reader :client, :appid, :secret, :token_file, :token_data
+    attr_reader :client, :appid, :secret
 
-    def initialize(client, appid, secret, token_file)
+    def initialize(client, appid, secret)
       @appid = appid
       @secret = secret
       @client = client
-      @token_file = token_file
     end
 
     def token
-      begin
-        @token_data ||= JSON.parse(File.read(token_file))
-      rescue
-        self.refresh
-      end
-      return valid_token(@token_data)
+      Redis.current.get(:access_token) || refresh
     end
 
     def refresh
       data = client.get("token", params:{grant_type: "client_credential", appid: appid, secret: secret})
-      File.open(token_file, 'w'){|f| f.write(data.to_s)} if valid_token(data)
-      return @token_data = data
+      Redis.current.setex(:access_token, data["expires_in"] - 5, data["access_token"])
+      data["access_token"]
     end
-
-    private 
-    def valid_token token_data
-      access_token = token_data["access_token"]
-      raise "Response didn't have access_token" if  access_token.blank?
-      return access_token
-    end
-
   end
 end

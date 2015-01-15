@@ -56,7 +56,7 @@ class Wechat::CardApi < Wechat::Api
   end
 
   def code_unavail(code, card_id)
-    post 'card/code/unavailable', {code: code, card_id: card_id}.to_json, headers 
+    post 'card/code/unavailable', {code: code, card_id: card_id}.to_json, headers
   end
 
   def card_update(payload = {})
@@ -69,5 +69,14 @@ class Wechat::CardApi < Wechat::Api
 
   def whitelist_set(payload = {})
     post 'card/testwhitelist/set', payload.to_json, headers
+  end
+
+  def js_add_card(card_ids)
+    card_list = card_ids.map do |card_id|
+                  params = { card_id: card_id, timestamp: Wechat::Utils.get_timestamp }
+                  params[:signature] = Wechat::Utils.get_add_card_sign(params.merge(appsecret: @secret))
+                  {card_id: card_id,  card_ext: params.to_json}
+                end
+    {card_list: card_list}.to_json
   end
 end

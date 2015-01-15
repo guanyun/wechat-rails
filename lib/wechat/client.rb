@@ -29,7 +29,7 @@ module Wechat
 
       raise "Request not OK, response code #{response.code}" if response.code != 200
       parse_response(response, as || :json) do |parse_as, data|
-        break data unless (parse_as == :json && data["errcode"].present?)
+        break data unless (parse_as == :json && data["errcode"].present? && data["errcode"] != 0)
 
         case data["errcode"]
         when 0 # for request didn't expect results

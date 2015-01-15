@@ -2,14 +2,16 @@ require 'wechat/client'
 require 'wechat/access_token'
 
 class Wechat::Api
-  attr_reader :access_token, :client
+  attr_reader :access_token, :client, :appid, :secret
 
   API_BASE = "https://api.weixin.qq.com/cgi-bin/"
   FILE_BASE = "http://file.api.weixin.qq.com/cgi-bin/"
 
-  def initialize appid, secret, token_file
+  def initialize appid, secret
+    @appid = appid
+    @secret = secret
     @client = Wechat::Client.new(API_BASE)
-    @access_token = Wechat::AccessToken.new(@client, appid, secret, token_file)
+    @access_token = Wechat::AccessToken.new(@client, appid, secret)
   end
 
   def users
@@ -60,6 +62,15 @@ class Wechat::Api
     post "message/template/send", message.to_json, content_type: :json
   end
 
+  def jsapi_ticket
+    if ticket = Redis.current.get(:jsapi_ticket)
+      ticket
+    else
+      data = get("ticket/getticket", { params: { type: 'jsapi' } })
+      Redis.current.setex :jsapi_ticket, data["expires_in"] - 5, data["ticket"]
+      data["ticket"]
+    end
+  end
 
   protected
   def get path, headers={}

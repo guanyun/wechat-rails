@@ -30,6 +30,12 @@ module Wechat
       md5(string_sign_temp).upcase
     end
 
+    def get_add_card_sign(params)
+      params = params.clone
+      string_sign_temp = to_query(params)
+      sha1(string_sign_temp).upcase
+    end
+
     def to_query(params = {})
       params.stringify_keys.sort.map { |key, value| "#{key}=#{value}" }.join('&')
     end
@@ -44,6 +50,26 @@ module Wechat
 
     def hash_to_xml(hash)
       hash.to_xml(root: "xml", skip_instruct: true, skip_types: true, dasherize: false)
+    end
+
+    def jssdk_config(url, api_list = ["chooseWXPay"], debug = false)
+      timestamp = get_timestamp
+      noncestr = get_nonce_str
+      signature = sha1(to_query({
+                     jsapi_ticket: Wechat.api.jsapi_ticket,
+                     timestamp: get_timestamp,
+                     nonceStr: get_nonce_str,
+                     url: url
+                   }))
+
+      {
+        debuge: debug,
+        appId: Wechat.config.appid,
+        timestamp: timestamp,
+        nonceStr: noncestr,
+        signature: signature,
+        jsApiList: api_list
+      }.to_json
     end
   end
 end
