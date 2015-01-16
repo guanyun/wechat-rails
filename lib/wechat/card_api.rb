@@ -72,11 +72,11 @@ class Wechat::CardApi < Wechat::Api
   end
 
   def js_add_card(signs)
-    timestamp = Wechat::Utils.get_timestamp
+    default_sign = { timestamp: Wechat::Utils.get_timestamp }
     card_list = signs.map do |sign|
-                  params = { timestamp: timestamp }
-                  params[:signature] = Wechat::Utils.get_add_card_sign(params.merge(sign))
-                  { cardId: sign[:card_id],  cardExt: params.to_json }
+                  sign.reverse_merge! default_sign
+                  sign[:signature] = Wechat::Utils.get_add_card_sign(sign.merge(appsecret: @secret))
+                  { cardId: sign.delete(:card_id),  cardExt: sign.to_json }
                 end
     {cardList: card_list}.to_json
   end
