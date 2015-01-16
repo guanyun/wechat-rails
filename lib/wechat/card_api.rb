@@ -71,12 +71,12 @@ class Wechat::CardApi < Wechat::Api
     post 'card/testwhitelist/set', payload.to_json, headers
   end
 
-  def js_add_card(card_ids)
+  def js_add_card(signs)
     timestamp = Wechat::Utils.get_timestamp
-    card_list = card_ids.map do |card_id|
+    card_list = signs.map do |sign|
                   params = { timestamp: timestamp }
-                  params[:signature] = Wechat::Utils.get_add_card_sign(params.merge(appsecret: @secret, card_id: card_id))
-                  { cardId: card_id,  cardExt: params.to_json }
+                  params[:signature] = Wechat::Utils.get_add_card_sign(params.merge(sign))
+                  { cardId: sign[:card_id],  cardExt: params.to_json }
                 end
     {cardList: card_list}.to_json
   end
