@@ -2,13 +2,13 @@ require 'wechat/utils'
 
 class Wechat::Payment
   API_MCH_BASE = "https://api.mch.weixin.qq.com/pay/"
-  attr_reader :client, :appid, :secret, :mchid, :key, :notify_url
+  attr_reader :client, :appid, :secret, :mch_id, :key, :notify_url
 
-  def initialize(appid, secret, mchid, key, notify_url)
+  def initialize(appid, secret, mch_id, key, notify_url)
     @client = Wechat::Client.new(API_MCH_BASE)
     @appid = appid
     @secret = secret
-    @mchid = mchid
+    @mch_id = mch_id
     @key = key
     @notify_url = notify_url
   end
@@ -30,7 +30,7 @@ class Wechat::Payment
   def unified_order(params)
     Wechat::Utils.required_check(params, [:body, :out_trade_no, :total_fee, :spbill_create_ip, :trade_type])
     params.reverse_merge! appid: appid,
-                          mch_id: mchid,
+                          mch_id: mch_id,
                           notify_url: notify_url,
                           nonce_str: Wechat::Utils.get_nonce_str
     params[:sign] = Wechat::Utils.get_sign(params, key)
@@ -61,5 +61,29 @@ class Wechat::Payment
 
   def verify?(params)
     Wechat::Utils.get_sign(params, key) == params[:sign]
+  end
+
+  def order_query(out_trade_no)
+    params = {
+      appId: appid,
+      mch_id: mch_id,
+      out_trade_no: out_trade_no,
+      nonce_str: Wechat::Utils.get_nonce_str,
+    }
+    params[:sign] = Wechat::Utils.get_sign(params, key)
+    xml_data = Wechat::Utils.hash_to_xml(params)
+    @client.post("orderquery", xml_data, as: :xml)
+  end
+
+  def close_order(out_trade_no)
+    params = {
+      appId: appid,
+      mch_id: mch_id,
+      out_trade_no: out_trade_no,
+      nonce_str: Wechat::Utils.get_nonce_str,
+    }
+    params[:sign] = Wechat::Utils.get_sign(params, key)
+    xml_data = Wechat::Utils.hash_to_xml(params)
+    @client.post("closeorder", xml_data, as: :xml)
   end
 end
