@@ -34,8 +34,8 @@ module Wechat
         case data["errcode"]
         when 0 # for request didn't expect results
           url =~ /card/ ? data : true  # card api return 0 when successful
-
-        when 40001, 42001, 40014 #42001: access_token超时, 40014:不合法的access_token
+        #42001: access_token超时, 40014:不合法的access_token, 48001: api unauthorized
+        when 40001, 42001, 40014, 48001
           raise AccessTokenExpiredError
 
         else
