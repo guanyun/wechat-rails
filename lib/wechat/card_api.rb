@@ -27,8 +27,10 @@ class Wechat::CardApi < Wechat::Api
     post 'card/qrcode/create', payload.to_json, headers
   end
 
-  def code_consume(code, card_id)
-    post 'card/code/consume', {code: code, card_id: card_id}.to_json, headers
+  def code_consume(code, card_id = nil)
+    payload = { code: code }
+    payload[:card_id] = card_id unless card_id.nil?
+    post 'card/code/consume', payload.to_json, headers
   end
 
   def code_decrypt(encrypt_code)
@@ -39,8 +41,10 @@ class Wechat::CardApi < Wechat::Api
     post 'card/delete', {card_id: card_id}.to_json, headers
   end
 
-  def code(code, card_id)
-    post 'card/code/get', {code: code, card_id: card_id}.to_json, headers
+  def code(code, card_id = nil)
+    payload = { code: code }
+    payload[:card_id] = card_id unless card_id.nil?
+    post 'card/code/get', payload.to_json, headers
   end
 
   def cards(offset = 0, count = 10)
