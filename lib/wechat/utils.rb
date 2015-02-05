@@ -57,8 +57,8 @@ module Wechat
       noncestr = get_nonce_str
       signature = sha1(to_query({
                      jsapi_ticket: Wechat.api.jsapi_ticket,
-                     timestamp: get_timestamp,
-                     nonceStr: get_nonce_str,
+                     timestamp: timestamp,
+                     nonceStr: noncestr,
                      url: url
                    }))
 
