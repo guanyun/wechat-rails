@@ -106,7 +106,7 @@ class Wechat::CardApi < Wechat::Api
   #       var cardList= res.cardList; // 用户选中的卡券列表信息
   #   }
   # });
-  def js_choose_card(params = {})
+  def js_choose_card(params = Hash.new(''))
     sign_params = {
       app_id: appid,
       times_tamp: Wechat::Utils.get_timestamp,
