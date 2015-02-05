@@ -106,8 +106,7 @@ class Wechat::CardApi < Wechat::Api
   #       var cardList= res.cardList; // 用户选中的卡券列表信息
   #   }
   # });
-  def js_choose_card(params)
-    Wechat::Utils.required_check(params, [:shop_id, :card_type, :card_id, :location_id])
+  def js_choose_card(params = {})
     sign_params = {
       app_id: appid,
       times_tamp: Wechat::Utils.get_timestamp,
