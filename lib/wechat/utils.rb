@@ -30,7 +30,7 @@ module Wechat
       md5(string_sign_temp).upcase
     end
 
-    def get_add_card_sign(params)
+    def get_card_sign(params)
       params = params.clone
       string_sign_temp = params.values.map(&:to_s).sort.join
       sha1(string_sign_temp).upcase

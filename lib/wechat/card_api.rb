@@ -75,13 +75,59 @@ class Wechat::CardApi < Wechat::Api
     post 'card/testwhitelist/set', payload.to_json, headers
   end
 
-  def js_add_card(signs)
-    default_sign = { timestamp: Wechat::Utils.get_timestamp }
-    card_list = signs.map do |sign|
-                  sign.reverse_merge! default_sign
-                  sign[:signature] = Wechat::Utils.get_add_card_sign(sign.merge(appsecret: @secret))
+  # wx.addCard({
+  #     cardList: [{
+  #         cardId: '',
+  #         cardExt: ''
+  #     }], // 需要添加的卡券列表
+  #     success: function (res) {
+  #         var cardList = res.cardList; // 添加的卡券列表信息
+  #     }
+  # });
+  def js_add_card(params)
+    default_sign_params = { timestamp: Wechat::Utils.get_timestamp, api_ticket: jsapi_ticket }
+    card_list = params.map do |sign_params|
+                  sign_params.reverse_merge! default_sign_params
+                  sign_params[:signature] = Wechat::Utils.get_card_sign(sign_params)
                   { cardId: sign.delete(:card_id),  cardExt: sign.to_json }
                 end
-    {cardList: card_list}.to_json
+    {cardList: card_list}
+  end
+
+  # wx.chooseCard({
+  #   shopId: '', // 门店Id
+  #   cardType: '', // 卡券类型
+  #   cardId: '', // 卡券Id
+  #   timestamp: 0, // 卡券签名时间戳
+  #   nonceStr: '', // 卡券签名随机串
+  #   signType: '', // 签名方式，默认'SHA1'
+  #   cardSign: '', // 卡券签名，详见附录4
+  #   success: function (res) {
+  #       var cardList= res.cardList; // 用户选中的卡券列表信息
+  #   }
+  # });
+  def js_choose_card(params)
+    Wechat::Utils.required_check(params, [:shop_id, :card_type, :card_id, :location_id])
+    sign_params = {
+      app_id: appid,
+      times_tamp: Wechat::Utils.get_timestamp,
+      api_ticket: jsapi_ticket,
+      nonce_str: Wechat::Utils.get_nonce_str,
+      card_id: params[:card_id],
+      card_type: params[:card_type],
+      location_id: params[:location_id]
+    }
+
+    card_sign = Wechat::Utils.get_card_sign(sign_params)
+
+    {
+      shopId: params[:shop_id],
+      cardType: params[:card_type],
+      cardId: params[:card_id],
+      timestamp: sign_params[:times_tamp],
+      nonceStr: sign_params[:nonce_str],
+      signType: 'SHA1',
+      cardSign: card_sign
+    }
   end
 end
