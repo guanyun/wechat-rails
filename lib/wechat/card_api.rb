@@ -109,21 +109,19 @@ class Wechat::CardApi < Wechat::Api
   def js_choose_card(params = Hash.new(''))
     sign_params = {
       app_id: appid,
-      times_tamp: Wechat::Utils.get_timestamp,
-      api_ticket: jsapi_ticket,
+      time_stamp: Wechat::Utils.get_timestamp,
+      appsecret: secret,
       nonce_str: Wechat::Utils.get_nonce_str,
       card_id: params[:card_id],
-      card_type: params[:card_type],
-      location_id: params[:location_id]
+      card_type: params[:card_type]
     }
 
     card_sign = Wechat::Utils.get_card_sign(sign_params)
 
     {
-      shopId: params[:shop_id],
-      cardType: params[:card_type],
-      cardId: params[:card_id],
-      timestamp: sign_params[:times_tamp],
+      cardType: sign_params[:card_type],
+      cardId: sign_params[:card_id],
+      timestamp: sign_params[:time_stamp],
       nonceStr: sign_params[:nonce_str],
       signType: 'SHA1',
       cardSign: card_sign
