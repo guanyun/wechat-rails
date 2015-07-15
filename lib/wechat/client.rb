@@ -54,7 +54,8 @@ module Wechat
 
       case parse_as
       when :file
-        file = Tempfile.new("tmp")
+        extname = response.headers[:content_disposition][/.*(\..*)\"/, 1]
+        file = Tempfile.new(["wx-", extname])
         file.binmode
         file.write(response.body)
         file.close
