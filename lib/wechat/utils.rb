@@ -33,7 +33,7 @@ module Wechat
     def get_card_sign(params)
       params = params.clone
       string_sign_temp = params.values.map(&:to_s).sort.join
-      sha1(string_sign_temp).upcase
+      sha1(string_sign_temp)
     end
 
     def to_query(params = {})

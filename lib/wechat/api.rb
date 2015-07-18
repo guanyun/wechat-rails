@@ -47,6 +47,10 @@ class Wechat::Api
     post "message/custom/send", message.to_json, content_type: :json
   end
 
+  def message_preview message
+    post "message/mass/preview", message.to_json, content_type: :json
+  end
+
   def create_qrcode(options = {})
     limited = options.delete(:limit)
     scene_id = options.delete(:scene_id)

@@ -85,13 +85,51 @@ class Wechat::CardApi < Wechat::Api
   #     }
   # });
   def js_add_card(params)
-    default_sign_params = { timestamp: Wechat::Utils.get_timestamp, api_ticket: jsapi_ticket }
+    default_sign_params = {
+      timestamp: Wechat::Utils.get_timestamp,
+      nonce_str: Wechat::Utils.get_nonce_str,
+      api_ticket: api_ticket
+    }
     card_list = params.map do |sign_params|
                   sign_params.reverse_merge! default_sign_params
                   sign_params[:signature] = Wechat::Utils.get_card_sign(sign_params)
-                  { cardId: sign.delete(:card_id),  cardExt: sign.to_json }
+                  sign_params.delete :api_ticket
+                  { cardId: sign_params.delete(:card_id),  cardExt: sign_params.to_json }
                 end
     {cardList: card_list}
+  end
+
+  def js_add_card(params)
+    default_sign_params = {
+      timestamp: Wechat::Utils.get_timestamp,
+      nonce_str: Wechat::Utils.get_nonce_str,
+      api_ticket: api_ticket
+    }
+    card_list = params.map do |sign_params|
+                  sign_params.reverse_merge! default_sign_params
+                  sign_params[:signature] = Wechat::Utils.get_card_sign(sign_params)
+                  sign_params.delete :api_ticket
+                  { cardId: sign_params.delete(:card_id),  cardExt: sign_params.to_json }
+                end
+    {cardList: card_list}
+  end
+
+  def to_wxcard_msg(touser, card_id)
+    sign_params = {
+      api_ticket: api_ticket,
+      timestamp: Wechat::Utils.get_timestamp,
+      nonce_str: Wechat::Utils.get_nonce_str,
+      card_id: card_id,
+    }
+    sign_params[:signature] = Wechat::Utils.get_card_sign(sign_params)
+    {
+      touser: touser,
+      msgtype: 'wxcard',
+      wxcard: {
+        card_id: card_id,
+        card_ext: sign_params.slice(:timestamp, :nonce_str, :signature).to_json
+      }
+    }
   end
 
   # wx.chooseCard({
@@ -126,5 +164,15 @@ class Wechat::CardApi < Wechat::Api
       signType: 'SHA1',
       cardSign: card_sign
     }
+  end
+
+  def api_ticket
+    if ticket = Redis.current.get(:api_ticket)
+      ticket
+    else
+      data = get("ticket/getticket", { params: { type: 'wx_card' } })
+      Redis.current.setex :api_ticket, data["expires_in"] - 5, data["ticket"]
+      data["ticket"]
+    end
   end
 end
