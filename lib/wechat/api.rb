@@ -44,11 +44,11 @@ class Wechat::Api
   end
 
   def custom_message_send message
-    post "message/custom/send", message.to_json, content_type: :json
+    post "message/custom/send", JSON.generate(message), content_type: :json
   end
 
   def message_preview message
-    post "message/mass/preview", message.to_json, content_type: :json
+    post "message/mass/preview", JON.generate(message), content_type: :json
   end
 
   def create_qrcode(options = {})
@@ -59,11 +59,23 @@ class Wechat::Api
                            expire_seconds: 1800,
                            action_info: { scene: { scene_id: scene_id } })
     options.delete(:expire_seconds) if limited
-    post "qrcode/create", options.to_json, content_type: :json
+    post "qrcode/create", JSON.generate(options), content_type: :json
   end
 
   def template_message_send message
-    post "message/template/send", message.to_json, content_type: :json
+    post "message/template/send", JSON.generate(message), content_type: :json
+  end
+
+  def batchget_material(options = {})
+    post "material/batchget_material", JSON.generate(options), content_type: :json
+  end
+
+  def get_material(media_id)
+    post "material/get_material", JSON.generate({ media_id: media_id }), content_type: :json
+  end
+
+  def shorturl(long_url)
+    post "shorturl", JSON.generate({ action: 'long2short', long_url: long_url }), content_type: :json
   end
 
   def jsapi_ticket
