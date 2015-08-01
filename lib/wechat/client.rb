@@ -51,26 +51,25 @@ module Wechat
         /^application\/json/ => :json,
         /^image\/.*/ => :file
       }.inject([]){|memo, match| memo<<match[1] if content_type =~ match[0]; memo}.first || as || :text
-
-      case parse_as
-      when :file
-        extname = response.headers[:content_disposition][/.*(\..*)\"/, 1]
-        file = Tempfile.new(["wx-", extname])
-        file.binmode
-        file.write(response.body)
-        file.close
-        data = file
-
-      when :json
-        data = HashWithIndifferentAccess.new_from_hash_copying_default(JSON.parse(response.body))
-      when :xml
-        xml = Hash.from_xml(response.body).fetch('xml', {})
-        data = HashWithIndifferentAccess.new_from_hash_copying_default(xml)
-      else
-        data = response.body
-      end
-
-      return yield(parse_as, data)
+      data =  case parse_as
+              when :file
+                if (content_disposition = response.headers[:content_disposition])
+                  extname = content_disposition[/.*(\..*)\"/, 1]
+                  file = Tempfile.new(["wx-", extname])
+                  file.binmode
+                  file.write(response.body)
+                  file.close
+                  file
+                end
+              when :json
+                HashWithIndifferentAccess.new_from_hash_copying_default(JSON.parse(response.body))
+              when :xml
+                xml = Hash.from_xml(response.body).fetch('xml', {})
+                HashWithIndifferentAccess.new_from_hash_copying_default(xml)
+              else
+                response.body
+              end
+      yield(parse_as, data)
     end
 
   end
