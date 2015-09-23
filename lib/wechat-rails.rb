@@ -1,6 +1,7 @@
-require "wechat/api"
+require 'wechat/api'
 require 'wechat/card_api'
-require "wechat/payment"
+require 'wechat/payment'
+require 'wechat/cash_coupon'
 
 module Wechat
   autoload :Message, "wechat/message"
@@ -42,6 +43,14 @@ module Wechat
 
   def card
     @card ||= Wechat::CardApi.new(config.appid, config.secret)
+  end
+
+  def cash_coupon
+    @cash_coupon ||= Wechat::CashCoupon.new(config.appid, config.mchid, config.key)
+  end
+
+  def api_client_cert
+    @api_client_cert ||= OpenSSL::PKCS12.new(File.read(config.api_client_cert), config.mchid)
   end
 end
 

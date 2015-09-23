@@ -21,6 +21,19 @@ module Wechat
       end
     end
 
+    def ssl_post path, payload, header = {}
+      request(path, header) do |url, header|
+        RestClient::Request.execute({
+          method: :post,
+          url: url,
+          payload: payload,
+          headers: header,
+          ssl_client_cert: Wechat.api_client_cert.certificate,
+          ssl_client_key: Wechat.api_client_cert.key,
+          verify_ssl: OpenSSL::SSL::VERIFY_NONE})
+      end
+    end
+
     def request path, header={}, &block
       url = "#{header.delete(:base) || self.base}#{path}"
       as = header.delete(:as)
