@@ -11,36 +11,15 @@ class Wechat::CashCoupon
     @wxappid = wxappid
   end
 
-  # https://pay.weixin.qq.com/wiki/doc/api/cash_coupon.php?chapter=13_5
-  def sendredpack(params)
-    Wechat::Utils.required_check(params, [:send_name, :re_openid, :total_amount, :wishing, :client_ip, :act_name, :remark])
-
-    params.merge!({
-      mch_id: mch_id,
-      wxappid: wxappid,
-      mch_billno: mch_billno,
-      total_num: 1,
-      nonce_str: Wechat::Utils.get_nonce_str})
-    params[:sign] = Wechat::Utils.get_sign(params, key)
-    xml_data = Wechat::Utils.hash_to_xml(params)
-    client.ssl_post("sendredpack", xml_data, as: :xml)
+  def send_redpack(params)
+    if params[:total_num] > 1
+      sendgroupredpack(params)
+    else
+      sendredpack(params)
+    end
   end
 
-  def sendgroupredpack(params)
-    Wechat::Utils.required_check(params, [:send_name, :re_openid, :total_amount, :total_num, :amt_type, :wishing, :act_name, :remark])
-
-    params.merge!({
-      mch_id: mch_id,
-      wxappid: wxappid,
-      mch_billno: mch_billno,
-      amt_type: 'ALL_RAND',
-      nonce_str: Wechat::Utils.get_nonce_str})
-    params[:sign] = Wechat::Utils.get_sign(params, key)
-    xml_data = Wechat::Utils.hash_to_xml(params)
-    client.ssl_post("sendgroupredpack", xml_data, as: :xml)
-  end
-
-  def gethbinfo(mch_billno, bill_type='MCHT')
+  def get_hbinfo(mch_billno, bill_type='MCHT')
     params = {
       mch_billno: mch_billno,
       bill_type: bill_type,
@@ -53,7 +32,31 @@ class Wechat::CashCoupon
     client.ssl_post("gethbinfo", xml_data, as: :xml)
   end
 
-  private
+  # https://pay.weixin.qq.com/wiki/doc/api/cash_coupon.php?chapter=13_5
+  def sendredpack(params)
+    Wechat::Utils.required_check(params, [:send_name, :re_openid, :total_amount, :total_num, :wishing, :act_name, :remark, :client_ip])
+    xml_data = build_redpack_data(params)
+    client.ssl_post("sendredpack", xml_data, as: :xml)
+  end
+
+  def sendgroupredpack(params)
+    Wechat::Utils.required_check(params, [:send_name, :re_openid, :total_amount, :total_num,  :wishing, :act_name, :remark, :amt_type])
+    xml_data = build_redpack_data(params)
+    client.ssl_post("sendgroupredpack", xml_data, as: :xml)
+  end
+
+  # private
+
+  def build_redpack_data(params)
+    params.merge!({
+      mch_id: mch_id,
+      wxappid: wxappid,
+      mch_billno: mch_billno,
+      nonce_str: Wechat::Utils.get_nonce_str})
+    params[:sign] = Wechat::Utils.get_sign(params, key)
+    Wechat::Utils.hash_to_xml(params)
+  end
+
   def mch_billno
     date = Time.now.strftime('%Y%m%d')
     ten_rand_num = 10.times.map{rand(10)}.join
