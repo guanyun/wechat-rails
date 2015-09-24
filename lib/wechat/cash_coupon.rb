@@ -27,7 +27,7 @@ class Wechat::CashCoupon
       mch_id: mch_id,
       appid: wxappid
     }
-    params[:sign] = Wechat::Utils.get_sign(params)
+    params[:sign] = Wechat::Utils.get_sign(params, key)
     xml_data = Wechat::Utils.hash_to_xml(params)
     client.ssl_post("gethbinfo", xml_data, as: :xml)
   end
