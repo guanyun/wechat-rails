@@ -27,9 +27,9 @@ class Wechat::CardApi < Wechat::Api
     post 'card/qrcode/create', payload.to_json, headers
   end
 
-  def code_consume(code, card_id = nil)
+  def code_consume(code, options = {})
     payload = { code: code }
-    payload[:card_id] = card_id unless card_id.nil?
+    payload.merge!(options) unless options.empty?
     post 'card/code/consume', payload.to_json, headers
   end
 
