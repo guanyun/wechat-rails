@@ -92,42 +92,31 @@ class Wechat::CardApi < Wechat::Api
     }
     card_list = params.map do |sign_params|
                   sign_params.reverse_merge! default_sign_params
-                  sign_params[:signature] = Wechat::Utils.get_card_sign(sign_params)
+                  sign_params[:signature] = Wechat::Utils.get_card_sign(sign_params.except(:outer_id))
                   sign_params.delete :api_ticket
-                  { cardId: sign_params.delete(:card_id),  cardExt: sign_params.to_json }
+                  {
+                    cardId: sign_params.delete(:card_id),
+                    cardExt: sign_params.to_json
+                  }
                 end
     {cardList: card_list}
   end
 
-  def js_add_card(params)
-    default_sign_params = {
-      timestamp: Wechat::Utils.get_timestamp,
-      nonce_str: Wechat::Utils.get_nonce_str,
-      api_ticket: api_ticket
-    }
-    card_list = params.map do |sign_params|
-                  sign_params.reverse_merge! default_sign_params
-                  sign_params[:signature] = Wechat::Utils.get_card_sign(sign_params)
-                  sign_params.delete :api_ticket
-                  { cardId: sign_params.delete(:card_id),  cardExt: sign_params.to_json }
-                end
-    {cardList: card_list}
-  end
-
-  def to_wxcard_msg(touser, card_id)
+  def to_wxcard_msg(touser, card_id, outer_id=0)
     sign_params = {
       api_ticket: api_ticket,
       timestamp: Wechat::Utils.get_timestamp,
       nonce_str: Wechat::Utils.get_nonce_str,
       card_id: card_id,
+      outer_id: outer_id
     }
-    sign_params[:signature] = Wechat::Utils.get_card_sign(sign_params)
+    sign_params[:signature] = Wechat::Utils.get_card_sign(sign_params.except(:outer_id))
     {
       touser: touser,
       msgtype: 'wxcard',
       wxcard: {
-        card_id: card_id,
-        card_ext: sign_params.slice(:timestamp, :nonce_str, :signature).to_json
+        card_id: sign_params.delete(:card_id),
+        card_ext: sign_params.to_json
       }
     }
   end

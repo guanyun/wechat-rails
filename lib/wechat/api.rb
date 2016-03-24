@@ -51,15 +51,21 @@ class Wechat::Api
     post "message/mass/preview", JON.generate(message), content_type: :json
   end
 
-  def create_qrcode(options = {})
-    limited = options.delete(:limit)
-    scene_id = options.delete(:scene_id)
-    action_name = limited ? 'QR_LIMIT_SCENE' : 'QR_SCENE'
-    options.reverse_merge!(action_name: action_name,
-                           expire_seconds: 1800,
-                           action_info: { scene: { scene_id: scene_id } })
-    options.delete(:expire_seconds) if limited
-    post "qrcode/create", JSON.generate(options), content_type: :json
+  def qrcode_create_scene(scene_id, expire_seconds = 604800)
+    post 'qrcode/create', JSON.generate(expire_seconds: expire_seconds,
+                                        action_name: 'QR_SCENE',
+                                        action_info: { scene: { scene_id: scene_id } })
+  end
+
+  def qrcode_create_limit_scene(scene_id_or_str)
+    case scene_id_or_str
+    when Fixnum
+      post 'qrcode/create', JSON.generate(action_name: 'QR_LIMIT_SCENE',
+                                          action_info: { scene: { scene_id: scene_id_or_str } })
+    else
+      post 'qrcode/create', JSON.generate(action_name: 'QR_LIMIT_STR_SCENE',
+                                          action_info: { scene: { scene_str: scene_id_or_str } })
+    end
   end
 
   def template_message_send message
