@@ -90,12 +90,12 @@ class Wechat::CardApi < Wechat::Api
   #     }
   # });
   def js_add_card(params)
-    default_sign_params = {
-      timestamp: Wechat::Utils.get_timestamp,
-      nonce_str: Wechat::Utils.get_nonce_str,
-      api_ticket: api_ticket
-    }
     card_list = params.map do |sign_params|
+                  default_sign_params = {
+                    timestamp: Wechat::Utils.get_timestamp,
+                    nonce_str: Wechat::Utils.get_nonce_str,
+                    api_ticket: api_ticket
+                  }
                   sign_params.reverse_merge! default_sign_params
                   sign_params[:signature] = Wechat::Utils.get_card_sign(sign_params.except(:outer_str))
                   sign_params.delete :api_ticket
