@@ -97,7 +97,7 @@ class Wechat::CardApi < Wechat::Api
     }
     card_list = params.map do |sign_params|
                   sign_params.reverse_merge! default_sign_params
-                  sign_params[:signature] = Wechat::Utils.get_card_sign(sign_params.except(:outer_id))
+                  sign_params[:signature] = Wechat::Utils.get_card_sign(sign_params.except(:outer_str))
                   sign_params.delete :api_ticket
                   {
                     cardId: sign_params.delete(:card_id),
