@@ -107,15 +107,15 @@ class Wechat::CardApi < Wechat::Api
     {cardList: card_list}
   end
 
-  def to_wxcard_msg(touser, card_id, outer_id=0)
+  def to_wxcard_msg(touser, card_id, outer_str=0)
     sign_params = {
       api_ticket: api_ticket,
       timestamp: Wechat::Utils.get_timestamp,
       nonce_str: Wechat::Utils.get_nonce_str,
       card_id: card_id,
-      outer_id: outer_id
+      outer_str: outer_str
     }
-    sign_params[:signature] = Wechat::Utils.get_card_sign(sign_params.except(:outer_id))
+    sign_params[:signature] = Wechat::Utils.get_card_sign(sign_params.except(:outer_str))
     {
       touser: touser,
       msgtype: 'wxcard',
