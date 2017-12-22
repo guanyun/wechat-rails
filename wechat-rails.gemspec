@@ -16,6 +16,6 @@ Gem::Specification.new do |s|
 
   s.add_dependency "rails", ">= 3.2.14"
   s.add_dependency "nokogiri", '>=1.6.0'
-  s.add_dependency 'rest-client'
+  s.add_dependency 'rest-client', ">= 2.0.0"
   s.add_development_dependency 'rspec-rails'
 end
