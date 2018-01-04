@@ -75,10 +75,10 @@ module Wechat
                   file
                 end
               when :json
-                HashWithIndifferentAccess.new_from_hash_copying_default(JSON.parse(response.body))
+                HashWithIndifferentAccess.new(JSON.parse(response.body))
               when :xml
                 xml = Hash.from_xml(response.body).fetch('xml', {})
-                HashWithIndifferentAccess.new_from_hash_copying_default(xml)
+                HashWithIndifferentAccess.new(xml)
               else
                 response.body
               end
