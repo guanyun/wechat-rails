@@ -3,8 +3,8 @@ module Wechat
     extend ActiveSupport::Concern
 
     included do
-      self.skip_before_filter :verify_authenticity_token
-      self.before_filter :verify_signature, only: [:show, :create]
+      self.skip_before_action :verify_authenticity_token
+      self.before_action :verify_signature, only: [:show, :create]
       #delegate :wehcat, to: :class
     end
 
