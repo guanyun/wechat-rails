@@ -89,7 +89,7 @@ module Wechat
       if response.respond_to? :to_xml
         render xml: response.to_xml
       else
-        render :nothing => true, :status => 200, :content_type => 'text/html'
+        head :ok
       end
     end
 
