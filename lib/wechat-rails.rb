@@ -1,5 +1,6 @@
 require 'wechat/api'
 require 'wechat/card_api'
+require 'wechat/gift_card_api'
 require 'wechat/payment'
 require 'wechat/cash_coupon'
 
@@ -43,6 +44,10 @@ module Wechat
 
   def card
     @card ||= Wechat::CardApi.new(config.appid, config.secret)
+  end
+
+  def gift_card
+    @gift_card ||= Wechat::GiftCardApi.new(config.appid, config.secret)
   end
 
   def cash_coupon
