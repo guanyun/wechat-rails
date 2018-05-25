@@ -74,7 +74,7 @@ module Wechat
 
 
     def show
-      render :text => params[:echostr]
+      render :plain => params[:echostr]
     end
 
     def create
