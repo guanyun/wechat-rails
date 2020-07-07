@@ -7,7 +7,7 @@ module Wechat
                 :secret,
                 :key,
                 :mchid,
-                :token
+                :token,
                 :access_token,
                 :api_client_cert,
                 :notify_url,
