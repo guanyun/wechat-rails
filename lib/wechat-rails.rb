@@ -22,15 +22,8 @@ module Wechat
 
   def config
     @config ||= begin
-      if defined? Rails
-        config_file = Rails.root.join("config/wechat.yml")
-        config = YAML.load(ERB.new(File.new(config_file).read).result)[Rails.env] if (File.exist?(config_file))
-      end
-
-      config ||= {appid: ENV["WECHAT_APPID"], secret: ENV["WECHAT_SECRET"], token: ENV["WECHAT_TOKEN"], access_token: ENV["WECHAT_ACCESS_TOKEN"]}
-      config.symbolize_keys!
-      config[:access_token] ||= Rails.root.join("tmp/access_token").to_s
-      OpenStruct.new(config)
+      require 'wechat/config'
+      Config.new
     end
   end
 
