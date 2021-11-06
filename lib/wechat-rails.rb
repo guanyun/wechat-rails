@@ -1,13 +1,14 @@
 require 'wechat/api'
 require 'wechat/card_api'
 require 'wechat/gift_card_api'
+require 'wechat/market_code_api'
 require 'wechat/payment'
 require 'wechat/cash_coupon'
 
 module Wechat
-  autoload :Message, "wechat/message"
-  autoload :Responder, "wechat/responder"
-  autoload :Response, "wechat/response"
+  autoload :Message, 'wechat/message'
+  autoload :Responder, 'wechat/responder'
+  autoload :Response, 'wechat/response'
 
   class AccessTokenExpiredError < StandardError; end
   class ResponseError < StandardError
@@ -21,10 +22,11 @@ module Wechat
   module_function
 
   def config
-    @config ||= begin
-      require 'wechat/config'
-      Config.new
-    end
+    @config ||=
+      begin
+        require 'wechat/config'
+        Config.new
+      end
   end
 
   def api
@@ -32,7 +34,14 @@ module Wechat
   end
 
   def payment
-    @payment ||= Wechat::Payment.new(config.appid, config.secret, config.mchid, config.key, config.notify_url)
+    @payment ||=
+      Wechat::Payment.new(
+        config.appid,
+        config.secret,
+        config.mchid,
+        config.key,
+        config.notify_url,
+      )
   end
 
   def card
@@ -44,23 +53,30 @@ module Wechat
   end
 
   def cash_coupon
-    @cash_coupon ||= Wechat::CashCoupon.new(config.appid, config.mchid, config.key)
+    @cash_coupon ||=
+      Wechat::CashCoupon.new(config.appid, config.mchid, config.key)
+  end
+
+  def market_code
+    @market_code ||= Wechat::MarketCodeApi.new(config.appid, config.secret)
   end
 
   def api_client_cert
-    @api_client_cert ||= OpenSSL::PKCS12.new(File.read(config.api_client_cert), config.mchid)
+    @api_client_cert ||=
+      OpenSSL::PKCS12.new(File.read(config.api_client_cert), config.mchid)
   end
 end
 
-if defined? ActionController::Base
+if defined?(ActionController::Base)
   class ActionController::Base
-    def self.wechat_responder opts={}
+    def self.wechat_responder(opts = {})
       self.send(:include, Wechat::Responder)
       if (opts.empty?)
         self.wechat = Wechat.api
         self.token = Wechat.config.token
       else
-        self.wechat = Wechat::Api.new(opts[:appid], opts[:secret], opts[:access_token])
+        self.wechat =
+          Wechat::Api.new(opts[:appid], opts[:secret], opts[:access_token])
         self.token = opts[:token]
       end
     end

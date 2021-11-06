@@ -12,6 +12,7 @@ module Wechat
                 :api_client_cert,
                 :notify_url,
                 :weapp_appid,
-                :sandbox_mode
+                :sandbox_mode,
+                :market_code_key
   end
 end
