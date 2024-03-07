@@ -18,6 +18,6 @@ Gem::Specification.new do |s|
   s.add_dependency "nokogiri", '>=1.6.0'
   s.add_dependency 'rest-client', ">= 2.0.0"
   s.add_development_dependency 'rspec-rails'
-  s.add_dependency 'anyway_config', "~> 2.6"
+  s.add_dependency 'anyway_config', "~> 2.2.0"
 
 end
