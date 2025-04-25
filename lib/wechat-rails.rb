@@ -1,5 +1,6 @@
 require 'wechat/api'
 require 'wechat/card_api'
+require 'wechat/mp_api'
 require 'wechat/gift_card_api'
 require 'wechat/market_code_api'
 require 'wechat/payment'

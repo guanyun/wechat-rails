@@ -9,7 +9,7 @@ module Wechat
     end
 
     def token
-      Redis.current.get(access_token_key) || refresh
+      read_token || refresh
     end
 
     def refresh
@@ -19,15 +19,21 @@ module Wechat
           params: {
             grant_type: 'client_credential',
             appid: appid,
-            secret: secret,
-          },
+            secret: secret
+          }
         )
-      Redis.current.setex(
-        access_token_key,
-        data['expires_in'] - 5,
-        data['access_token'],
-      )
+      write_token(data)
       data['access_token']
+    end
+
+    protected
+
+    def read_token
+      puts "You should implement this `read_token` method on your own"
+    end
+
+    def write_token(data) # rubocop:disable Lint/UnusedMethodArgument
+      puts "You should implement this `write_token` method on your own"
     end
 
     private
